@@ -1,30 +1,28 @@
 const fs = require('fs');
-const { Command } = require('commander');
-const program = new Command();
+const { program } = require('commander');
 
+// Налаштування командного рядка
 program
-    .version('1.0.0')
-    .description('Програма для обробки даних з JSON')
-    .option('-i, --input <path>', 'Шлях до файлу для читання (обов\'язковий)')
-    .option('-o, --output <path>', 'Шлях до файлу для запису (необов\'язковий)')
-    .option('-d, --display', 'Вивести результат у консоль (необов\'язковий)')
-    .parse(process.argv);
+    .requiredOption('-i, --input <path>', 'шлях до файлу для читання')
+    .option('-o, --output <path>', 'шлях до файлу для запису')
+    .option('-d, --display', 'вивести результат у консоль');
 
+program.parse(process.argv);
 const options = program.opts();
 
-// Перевірка наявності обов'язкового параметра
+// Перевірка наявності вхідного файлу
 if (!options.input) {
-    console.error('Please, specify input file');
+    console.error("Please, specify input file");
     process.exit(1);
 }
 
-// Читання JSON
+// Читання даних з файлу
 let jsonData;
 try {
     const data = fs.readFileSync(options.input);
     jsonData = JSON.parse(data);
 } catch (err) {
-    console.error('Cannot find input file');
+    console.error("Cannot find input file");
     process.exit(1);
 }
 
@@ -32,7 +30,7 @@ try {
 let minAsset = null;
 
 jsonData.forEach(asset => {
-    if (minAsset === null || asset.value < minAsset.value) {
+    if (asset.value > 0 && (minAsset === null || asset.value < minAsset.value)) {
         minAsset = asset;
     }
 });
@@ -41,10 +39,12 @@ jsonData.forEach(asset => {
 if (minAsset) {
     const result = `${minAsset.txt}: ${minAsset.value}`;
 
+    // Виведення результату у консоль, якщо задано параметр -d
     if (options.display) {
         console.log(result);
     }
 
+    // Запис у файл, якщо задано параметр -o
     if (options.output) {
         try {
             fs.writeFileSync(options.output, result);
@@ -54,7 +54,6 @@ if (minAsset) {
         }
     }
 } else {
-    console.log('Не вдалося знайти активи');
+    console.log("Не знайдено активів з позитивними значеннями.");
 }
-
 
