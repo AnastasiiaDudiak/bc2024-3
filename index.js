@@ -28,15 +28,26 @@ try {
     process.exit(1);
 }
 
-// Виведення результату
+// Логіка для знаходження активу з найменшим значенням
+let minAsset = null;
+
+jsonData.forEach(asset => {
+    if (minAsset === null || asset.value < minAsset.value) {
+        minAsset = asset;
+    }
+});
+
+// Формат виводу
+const result = `${minAsset.name}: ${minAsset.value}`;
+
 if (options.display) {
-    console.log(jsonData);
+    console.log(result);
 }
 
 // Запис у файл, якщо вказано
 if (options.output) {
     try {
-        fs.writeFileSync(options.output, JSON.stringify(jsonData, null, 2));
+        fs.writeFileSync(options.output, result);
         console.log(`Результат записано в файл: ${options.output}`);
     } catch (err) {
         console.error('Error writing to output file');
