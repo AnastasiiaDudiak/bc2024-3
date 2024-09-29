@@ -18,29 +18,29 @@ if (!options.input) {
     process.exit(1);
 }
 
-// Читання файлу
-fs.readFile(options.input, 'utf8', (err, data) => {
-    if (err) {
-        console.error('Cannot find input file');
+let jsonData;
+try {
+    // Читання файлу синхронно
+    const data = fs.readFileSync(options.input, 'utf8');
+    jsonData = JSON.parse(data);
+} catch (err) {
+    console.error('Cannot find input file');
+    process.exit(1);
+}
+
+// Виведення результату
+if (options.display) {
+    console.log(jsonData);
+}
+
+// Запис у файл, якщо вказано
+if (options.output) {
+    try {
+        fs.writeFileSync(options.output, JSON.stringify(jsonData, null, 2));
+        console.log(`Результат записано в файл: ${options.output}`);
+    } catch (err) {
+        console.error('Error writing to output file');
         process.exit(1);
     }
+}
 
-    // Тут ти можеш обробити дані JSON
-    const jsonData = JSON.parse(data);
-
-    // Виведення результату
-    if (options.display) {
-        console.log(jsonData);
-    }
-
-    // Запис у файл, якщо вказано
-    if (options.output) {
-        fs.writeFile(options.output, JSON.stringify(jsonData, null, 2), (err) => {
-            if (err) {
-                console.error('Error writing to output file');
-                process.exit(1);
-            }
-            console.log(`Результат записано в файл: ${options.output}`);
-        });
-    }
-});
