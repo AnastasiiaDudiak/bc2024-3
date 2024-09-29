@@ -39,7 +39,7 @@ jsonData.forEach(asset => {
 
 // Формат виводу
 if (minAsset) {
-    const result = `${minAsset.name}: ${minAsset.value}`;
+    const result = `${minAsset.txt}: ${minAsset.value}`;
 
     if (options.display) {
         console.log(result);
